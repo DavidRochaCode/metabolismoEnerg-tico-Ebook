@@ -31,6 +31,19 @@ function scene:create( event )
         local pag = display.newImageRect(sceneGroup, "assetsN/Pag5.png", 449, 104)
         pag.x =  300
         pag.y =  210
+
+         -- Adicionar texto para indicar ON ou OFF abaixo da imagem do som
+         local soundText = display.newText({
+            parent = sceneGroup,
+            text = "Ligado", 
+            x = soundOn.x,
+            y = soundOn.y + 40, 
+            font = native.systemFontBold,
+            fontSize = 24,
+            align = "center"
+        })
+        -- Definir a cor rgba(65, 97, 176, 1)
+        soundText:setFillColor(65/255, 97/255, 176/255, 1)
     
         Nextbutton:addEventListener("tap", function(event)
             composer.gotoScene("contraCapa")
@@ -46,12 +59,14 @@ function scene:create( event )
         -- Função para alternar entre som ligado e mudo
         local function toggleSound(event)
             if soundHandle then
-                -- Se o som está ligado, mudar para mudo
+                
                 soundOn.fill = { type = "image", filename = "assets/mute.png" }
+                soundText.text = "Desligado" 
                 soundHandle = false
             else
-                -- Se o som está mudo, mudar para som ligado
+                
                 soundOn.fill = { type = "image", filename = "assets/soundOn.png" }
+                soundText.text = "Ligado"
                 soundHandle = true
             end
         end

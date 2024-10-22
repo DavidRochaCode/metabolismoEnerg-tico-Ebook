@@ -28,6 +28,19 @@ function scene:create( event )
     soundOn.x =  685
     soundOn.y =  210
 
+    -- Adicionar texto para indicar ON ou OFF abaixo da imagem do som
+    local soundText = display.newText({
+        parent = sceneGroup,
+        text = "Ligado", 
+        x = soundOn.x,
+        y = soundOn.y + 40, 
+        font = native.systemFontBold,
+        fontSize = 24,
+        align = "center"
+    })
+    -- Definir a cor rgba(65, 97, 176, 1)
+    soundText:setFillColor(65/255, 97/255, 176/255, 1)
+
 
     -- Adicionar o evento de toque ao botão
     Nextbutton:addEventListener("tap", function(event)
@@ -39,10 +52,12 @@ function scene:create( event )
             if soundHandle then
                 
                 soundOn.fill = { type = "image", filename = "assets/mute.png" }
+                soundText.text = "Desligado" 
                 soundHandle = false
             else
                 
                 soundOn.fill = { type = "image", filename = "assets/soundOn.png" }
+                soundText.text = "Ligado"
                 soundHandle = true
             end
         end

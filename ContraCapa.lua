@@ -112,7 +112,20 @@ function scene:create( event )
 
     local soundOn = display.newImageRect(sceneGroup, "assets/soundOn.png", 60, 60)
         soundOn.x =  685
-        soundOn.y =  208
+        soundOn.y =  210
+
+        -- Adicionar texto para indicar ON ou OFF abaixo da imagem do som
+        local soundText = display.newText({
+            parent = sceneGroup,
+            text = "Ligado", 
+            x = soundOn.x,
+            y = soundOn.y + 40, 
+            font = native.systemFontBold,
+            fontSize = 24,
+            align = "center"
+        })
+        -- Definir a cor rgba(65, 97, 176, 1)
+        soundText:setFillColor(65/255, 97/255, 176/255, 1)
 
     local refButton = display.newImageRect(sceneGroup, "assets/ref.png", 130, 130)
     refButton.x =  165
@@ -131,12 +144,14 @@ function scene:create( event )
       -- Função para alternar entre som ligado e mudo
       local function toggleSound(event)
         if soundHandle then
-            -- Se o som está ligado, mudar para mudo
+                
             soundOn.fill = { type = "image", filename = "assets/mute.png" }
+            soundText.text = "Desligado" -- Atualiza o texto para "OFF"
             soundHandle = false
         else
-            -- Se o som está mudo, mudar para som ligado
+            
             soundOn.fill = { type = "image", filename = "assets/soundOn.png" }
+            soundText.text = "Ligado"
             soundHandle = true
         end
     end
