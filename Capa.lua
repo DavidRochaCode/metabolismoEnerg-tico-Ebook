@@ -15,7 +15,7 @@ function scene:create( event )
     local sceneGroup = self.view
 
     -- Carregar a imagem de background
-    local background = display.newImageRect(sceneGroup, "assets/Capa.png", display.contentWidth, display.contentHeight)
+    local background = display.newImageRect(sceneGroup, "assets/capa.png", display.contentWidth, display.contentHeight)
     background.x = display.contentCenterX
     background.y = display.contentCenterY
 

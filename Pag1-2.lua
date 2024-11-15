@@ -10,7 +10,7 @@ function scene:create( event )
     local sceneGroup = self.view
 
     -- Carregar a imagem de background
-    local background = display.newImageRect(sceneGroup, "assetsN/pag4.png", display.contentWidth, display.contentHeight)
+    local background = display.newImageRect(sceneGroup, "assetsN/pag1-2.png", display.contentWidth, display.contentHeight)
     background.x = display.contentCenterX
     background.y = display.contentCenterY
 
@@ -42,13 +42,13 @@ function scene:create( event )
         soundText:setFillColor(65/255, 97/255, 176/255, 1)
 
 
-    
+
         Nextbutton:addEventListener("tap", function(event)
-            composer.gotoScene("Pag4-1")
+            composer.gotoScene("Pag1-3")
         end)
 
         Prevbutton : addEventListener("tap", function (event)
-            composer.gotoScene("Pag3-3")
+            composer.gotoScene("Pag1")
    
         end)
 
@@ -58,7 +58,7 @@ function scene:create( event )
             if soundHandle then
                 
                 soundOn.fill = { type = "image", filename = "assets/mute.png" }
-                soundText.text = "Desligado" -- Atualiza o texto para "OFF"
+                soundText.text = "Desligado" 
                 soundHandle = false
             else
                 

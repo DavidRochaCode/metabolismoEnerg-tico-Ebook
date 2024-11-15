@@ -85,7 +85,7 @@ local function onPrevButtonTap(event)
         print("Pop-up ativo, botão Prev desabilitado!")
         return true 
     else
-        composer.gotoScene("Pag5")
+        composer.gotoScene("Pag6")
     end
     -- Função de ação do botão anterior
     print("Botão Prev ativo!")

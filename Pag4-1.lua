@@ -10,7 +10,7 @@ function scene:create( event )
     local sceneGroup = self.view
 
     -- Carregar a imagem de background
-    local background = display.newImageRect(sceneGroup, "assetsN/pag4.png", display.contentWidth, display.contentHeight)
+    local background = display.newImageRect(sceneGroup, "assetsN/pag4-1.png", display.contentWidth, display.contentHeight)
     background.x = display.contentCenterX
     background.y = display.contentCenterY
 
@@ -44,11 +44,11 @@ function scene:create( event )
 
     
         Nextbutton:addEventListener("tap", function(event)
-            composer.gotoScene("Pag4-1")
+            composer.gotoScene("Pag4-2")
         end)
 
         Prevbutton : addEventListener("tap", function (event)
-            composer.gotoScene("Pag3-3")
+            composer.gotoScene("Pag4")
    
         end)
 

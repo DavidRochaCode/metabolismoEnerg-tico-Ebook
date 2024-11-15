@@ -10,7 +10,7 @@ function scene:create( event )
     local sceneGroup = self.view
 
     -- Carregar a imagem de background
-    local background = display.newImageRect(sceneGroup, "assets/background.png", display.contentWidth, display.contentHeight)
+    local background = display.newImageRect(sceneGroup, "assetsN/pag5.png", display.contentWidth, display.contentHeight)
     background.x = display.contentCenterX
     background.y = display.contentCenterY
 
@@ -28,9 +28,6 @@ function scene:create( event )
         soundOn.x =  685
         soundOn.y =  210
 
-        local pag = display.newImageRect(sceneGroup, "assetsN/Pag5.png", 449, 104)
-        pag.x =  300
-        pag.y =  210
 
          -- Adicionar texto para indicar ON ou OFF abaixo da imagem do som
          local soundText = display.newText({
@@ -46,11 +43,11 @@ function scene:create( event )
         soundText:setFillColor(65/255, 97/255, 176/255, 1)
     
         Nextbutton:addEventListener("tap", function(event)
-            composer.gotoScene("contraCapa")
+            composer.gotoScene("Pag5-1")
         end)
 
         Prevbutton : addEventListener("tap", function (event)
-            composer.gotoScene("Pag4")
+            composer.gotoScene("Pag4-2")
    
         end)
 
