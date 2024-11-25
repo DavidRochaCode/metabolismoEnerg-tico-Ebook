@@ -1,12 +1,13 @@
-local composer = require( "composer" )
+local composer = require("composer")
 local scene = composer.newScene()
 
--- -----------------------------------------------------------------------------------
--- Scene event functions
--- -----------------------------------------------------------------------------------
-local soundHandle = true
+-- Variáveis globais para a cena
+local soundFile = audio.loadStream("assetsAudio/Fotossíntese_ Fase_Clara.mp3") -- Substitua pelo caminho do seu arquivo de áudio
+local soundText
+local soundOn
+
 -- create()
-function scene:create( event )
+function scene:create(event)
     local sceneGroup = self.view
 
     -- Carregar a imagem de background
@@ -14,105 +15,116 @@ function scene:create( event )
     background.x = display.contentCenterX
     background.y = display.contentCenterY
 
-        -- Adicionar a imagem do botão
-        local Nextbutton = display.newImageRect(sceneGroup, "assets/next-button.png", 176, 42) -- ajuste as dimensões da imagem do botão
-        Nextbutton.x = 640
-        Nextbutton.y = 980
+    -- Adicionar a imagem do botão "Próximo"
+    local Nextbutton = display.newImageRect(sceneGroup, "assets/next-button.png", 176, 42)
+    Nextbutton.x = 640
+    Nextbutton.y = 980
 
-        local Prevbutton = display.newImageRect(sceneGroup, "assets/prev-button.png", 176, 42)
-        Prevbutton.x =  130
-        Prevbutton.y = 980
+    -- Adicionar a imagem do botão "Voltar"
+    local Prevbutton = display.newImageRect(sceneGroup, "assets/prev-button.png", 176, 42)
+    Prevbutton.x = 130
+    Prevbutton.y = 980
 
+    -- Adicionar a imagem do botão de som
+    soundOn = display.newImageRect(sceneGroup, "assets/mute.png", 60, 60)
+    soundOn.x = 685
+    soundOn.y = 210
 
-        local soundOn = display.newImageRect(sceneGroup, "assets/soundOn.png", 60, 60)
-        soundOn.x =  685
-        soundOn.y =  210
+    -- Adicionar texto para indicar ON ou OFF abaixo da imagem do som
+    soundText = display.newText({
+        parent = sceneGroup,
+        text = "Desligado", -- Texto inicial reflete o som desligado
+        x = soundOn.x,
+        y = soundOn.y + 40,
+        font = native.systemFontBold,
+        fontSize = 24,
+        align = "center"
+    })
+    soundText:setFillColor(65 / 255, 97 / 255, 176 / 255, 1)
+    soundText.status = "pausado" -- Define o status inicial do som
 
-         -- Adicionar texto para indicar ON ou OFF abaixo da imagem do som
-         local soundText = display.newText({
-            parent = sceneGroup,
-            text = "Ligado", 
-            x = soundOn.x,
-            y = soundOn.y + 40, 
-            font = native.systemFontBold,
-            fontSize = 24,
-            align = "center"
-        })
-        -- Definir a cor rgba(65, 97, 176, 1)
-        soundText:setFillColor(65/255, 97/255, 176/255, 1)
-
-
-
-        Nextbutton:addEventListener("tap", function(event)
-            composer.gotoScene("Pag1-2")
-        end)
-
-        Prevbutton : addEventListener("tap", function (event)
-            composer.gotoScene("Capa")
-   
-        end)
-
-
-        -- Função para alternar entre som ligado e mudo
-        local function toggleSound(event)
-            if soundHandle then
-                
-                soundOn.fill = { type = "image", filename = "assets/mute.png" }
-                soundText.text = "Desligado" 
-                soundHandle = false
-            else
-                
-                soundOn.fill = { type = "image", filename = "assets/soundOn.png" }
-                soundText.text = "Ligado"
-                soundHandle = true
-            end
+    -- Função para alternar entre som ligado e mudo
+    local function toggleSound(event)
+        if soundText.status == "pausado" then
+            -- Alterar para som ligado
+            soundOn.fill = { type = "image", filename = "assets/soundOn.png" }
+            soundText.text = "Ligado"
+            soundText.status = "tocando"
+            audio.stop(1) -- Garante que o canal esteja pronto
+            audio.rewind(soundFile) -- Reinicia o áudio do início
+            audio.play(soundFile, {
+                channel = 1,
+                loops = -1, -- Loop infinito
+                fadein = 1000
+            })
+        elseif soundText.status == "tocando" then
+            -- Alterar para som desligado
+            soundOn.fill = { type = "image", filename = "assets/mute.png" }
+            soundText.text = "Desligado"
+            soundText.status = "pausado"
+            audio.pause(1) -- Pausa o áudio no canal 1
         end
+    end
 
-    soundOn: addEventListener("tap", toggleSound)
+    -- Adiciona o evento de toque ao botão de som
+    soundOn:addEventListener("tap", toggleSound)
+
+    -- Navegação para a próxima página
+    Nextbutton:addEventListener("tap", function(event)
+        composer.gotoScene("Pag1-2")
+    end)
+
+    -- Navegação para a página anterior
+    Prevbutton:addEventListener("tap", function(event)
+        composer.gotoScene("Capa")
+    end)
 end
 
 -- show()
-function scene:show( event )
+function scene:show(event)
     local sceneGroup = self.view
     local phase = event.phase
 
-    if ( phase == "will" ) then
-        -- Code here runs when the scene is still off screen (but is about to come on screen)
-
-    elseif ( phase == "did" ) then
-        -- Code here runs when the scene is entirely on screen
-
+    if (phase == "will") then
+        -- Código executado antes da cena aparecer
+    elseif (phase == "did") then
+        -- Código executado quando a cena está visível
     end
 end
 
 -- hide()
-function scene:hide( event )
+function scene:hide(event)
     local sceneGroup = self.view
     local phase = event.phase
 
-    if ( phase == "will" ) then
-        -- Code here runs when the scene is on screen (but is about to go off screen)
+    if (phase == "will") then
+        -- Código executado antes da cena sair da tela
+        audio.stop(1) -- Para o áudio no canal 1
 
-    elseif ( phase == "did" ) then
-        -- Code here runs immediately after the scene goes entirely off screen
-
+        if soundText then
+            soundText.status = "pausado" -- Reseta o status para "pausado"
+            soundOn.fill = { type = "image", filename = "assets/mute.png" }
+            soundText.text = "Desligado"
+        end
+    elseif (phase == "did") then
+        -- Código executado após a cena sair da tela
     end
 end
 
 -- destroy()
-function scene:destroy( event )
+function scene:destroy(event)
     local sceneGroup = self.view
-    -- Code here runs prior to the removal of scene's view
-
+    -- Código executado antes da cena ser destruída
+    if soundFile then
+        audio.dispose(soundFile) -- Libera o recurso de áudio
+        soundFile = nil
+    end
 end
 
--- -----------------------------------------------------------------------------------
 -- Scene event function listeners
--- -----------------------------------------------------------------------------------
-scene:addEventListener( "create", scene )
-scene:addEventListener( "show", scene )
-scene:addEventListener( "hide", scene )
-scene:addEventListener( "destroy", scene )
--- -----------------------------------------------------------------------------------
+scene:addEventListener("create", scene)
+scene:addEventListener("show", scene)
+scene:addEventListener("hide", scene)
+scene:addEventListener("destroy", scene)
 
 return scene

@@ -6,6 +6,10 @@ local startDistance = nil
 local isMoleculeSplit = false
 local compounds = {} -- Armazena os compostos criados para facilitar a limpeza
 
+local soundFile = audio.loadStream("assetsAudio/separar_glicose.mp3") -- Substitua pelo caminho do seu arquivo de áudio
+local soundText
+local soundOn
+
 -- Função para limpar recursos da cena
 local function cleanScene()
     -- Remove todos os compostos
@@ -38,14 +42,15 @@ function scene:create(event)
     Prevbutton.x = 130
     Prevbutton.y = 980
 
-    local soundOn = display.newImageRect(sceneGroup, "assets/soundOn.png", 60, 60)
+    -- Adicionar o botão de som
+    soundOn = display.newImageRect(sceneGroup, "assets/mute.png", 60, 60)
     soundOn.x = 685
     soundOn.y = 210
 
     -- Adicionar texto para indicar ON ou OFF
-    local soundText = display.newText({
+    soundText = display.newText({
         parent = sceneGroup,
-        text = "Ligado",
+        text = "Desligado",
         x = soundOn.x,
         y = soundOn.y + 40,
         font = native.systemFontBold,
@@ -53,6 +58,32 @@ function scene:create(event)
         align = "center"
     })
     soundText:setFillColor(65 / 255, 97 / 255, 176 / 255, 1)
+    soundText.status = "pausado"
+
+    -- Função para alternar entre som ligado e mudo
+    local function toggleSound()
+        if soundText.status == "pausado" then
+            -- Alterar para som ligado
+            soundOn.fill = { type = "image", filename = "assets/soundOn.png" }
+            soundText.text = "Ligado"
+            soundText.status = "tocando"
+            audio.stop(1)
+            audio.rewind(soundFile)
+            audio.play(soundFile, {
+                channel = 1,
+                loops = -1,
+                fadein = 1000
+            })
+        elseif soundText.status == "tocando" then
+            -- Alterar para som desligado
+            soundOn.fill = { type = "image", filename = "assets/mute.png" }
+            soundText.text = "Desligado"
+            soundText.status = "pausado"
+            audio.pause(1)
+        end
+    end
+
+    soundOn:addEventListener("tap", toggleSound)
 
     Nextbutton:addEventListener("tap", function()
         composer.gotoScene("Pag5")
@@ -61,20 +92,6 @@ function scene:create(event)
     Prevbutton:addEventListener("tap", function()
         composer.gotoScene("Pag4-1")
     end)
-
-    local function toggleSound()
-        if soundHandle then
-            soundOn.fill = { type = "image", filename = "assets/mute.png" }
-            soundText.text = "Desligado"
-            soundHandle = false
-        else
-            soundOn.fill = { type = "image", filename = "assets/soundOn.png" }
-            soundText.text = "Ligado"
-            soundHandle = true
-        end
-    end
-
-    soundOn:addEventListener("tap", toggleSound)
 
     -- Salvar funções para recriação de recursos
     self.createMoleculeAndPinch = function()
@@ -150,11 +167,21 @@ end
 function scene:hide(event)
     if event.phase == "will" then
         cleanScene() -- Limpa todos os recursos ao sair da cena
+        audio.stop(1)
+        if soundText then
+            soundText.status = "pausado"
+            soundOn.fill = { type = "image", filename = "assets/mute.png" }
+            soundText.text = "Desligado"
+        end
     end
 end
 
 function scene:destroy(event)
     cleanScene() -- Limpa todos os recursos ao destruir a cena
+    if soundFile then
+        audio.dispose(soundFile)
+        soundFile = nil
+    end
 end
 
 scene:addEventListener("create", scene)

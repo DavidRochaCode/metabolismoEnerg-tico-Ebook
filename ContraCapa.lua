@@ -1,43 +1,37 @@
-local composer = require( "composer" )
+local composer = require("composer")
 local scene = composer.newScene()
 
--- -----------------------------------------------------------------------------------
--- Scene event functions
--- -----------------------------------------------------------------------------------
-local soundHandle = true
+-- Variáveis globais para a cena
+local soundFile = audio.loadStream("assetsAudio/contraCapa.mp3") -- Substitua pelo caminho do seu arquivo de áudio
+local soundText
+local soundOn
 local popupGroup
 
 IsPopupActive = false
 
-
-
 -- Função para pulsar o botão
 local function pulseButton(button)
-     -- Definimos as duas funções localmente antes de chamar uma delas
-     local scaleUp
-     local scaleDown
- 
-     -- Animação para diminuir o tamanho do botão 
-     scaleDown = function()
-         transition.to(button, {time=500, xScale=1.0, yScale=1.0, onComplete=scaleUp})
-     end
- 
-     -- Animação para aumentar o tamanho do botão
-     scaleUp = function()
-         transition.to(button, {time=500, xScale=1.2, yScale=1.2, onComplete=scaleDown})
-     end
- 
-     -- Iniciar o ciclo de pulsação
-     scaleUp()
-    
+    local scaleUp
+    local scaleDown
+
+    -- Animação para diminuir o tamanho do botão 
+    scaleDown = function()
+        transition.to(button, {time = 500, xScale = 1.0, yScale = 1.0, onComplete = scaleUp})
+    end
+
+    -- Animação para aumentar o tamanho do botão
+    scaleUp = function()
+        transition.to(button, {time = 500, xScale = 1.2, yScale = 1.2, onComplete = scaleDown})
+    end
+
+    -- Iniciar o ciclo de pulsação
+    scaleUp()
 end
-
-
 
 -- Função para fechar o pop-up
 local function closePopup()
     if popupGroup then
-        popupGroup:removeSelf() 
+        popupGroup:removeSelf()
         popupGroup = nil
         IsPopupActive = false
     end
@@ -45,19 +39,16 @@ end
 
 -- Função para abrir o pop-up
 local function showPopup()
-    
     popupGroup = display.newGroup()
-
     IsPopupActive = true
 
-  
     local popupBackground = display.newRect(popupGroup, display.contentCenterX, display.contentCenterY, 650, 800)
-    popupBackground:setFillColor(0.839, 0.933, 0.725, 1) 
+    popupBackground:setFillColor(0.839, 0.933, 0.725, 1)
 
-     -- Adicionando a imagem dentro do pop-up
-     local popupImage = display.newImageRect(popupGroup, "assets/referencias.png", 650, 800) 
-     popupImage.x = display.contentCenterX 
-     popupImage.y = display.contentCenterY 
+    -- Adicionando a imagem dentro do pop-up
+    local popupImage = display.newImageRect(popupGroup, "assets/referencias.png", 650, 800)
+    popupImage.x = display.contentCenterX
+    popupImage.y = display.contentCenterY
 
     -- Botão de fechar o pop-up
     local closeButton = display.newText(popupGroup, "Fechar", display.contentCenterX, display.contentCenterY + 90, native.systemFont, 30)
@@ -71,11 +62,11 @@ end
 local function onReloadButtonTap(event)
     if IsPopupActive then
         print("Pop-up ativo, botão Reload desabilitado!")
-        return true 
+        return true
     else
         composer.gotoScene("Capa")
     end
-    
+
     print("Botão Reload ativo!")
 end
 
@@ -83,16 +74,15 @@ end
 local function onPrevButtonTap(event)
     if IsPopupActive then
         print("Pop-up ativo, botão Prev desabilitado!")
-        return true 
+        return true
     else
         composer.gotoScene("Pag6")
     end
-    -- Função de ação do botão anterior
     print("Botão Prev ativo!")
 end
 
 -- create()
-function scene:create( event )
+function scene:create(event)
     local sceneGroup = self.view
 
     -- Carregar a imagem de background
@@ -100,107 +90,113 @@ function scene:create( event )
     background.x = display.contentCenterX
     background.y = display.contentCenterY
 
-    -- Adicionar a imagem do botão
-    local reloadButton = display.newImageRect(sceneGroup, "assets/reload.png", 176, 42) -- ajuste as dimensões da imagem do botão
+    -- Adicionar a imagem do botão "Reload"
+    local reloadButton = display.newImageRect(sceneGroup, "assets/reload.png", 176, 42)
     reloadButton.x = 640
     reloadButton.y = 980
 
+    -- Adicionar a imagem do botão "Prev"
     local prevButton = display.newImageRect(sceneGroup, "assets/prev-button.png", 176, 42)
-    prevButton.x =  130
+    prevButton.x = 130
     prevButton.y = 980
 
+    -- Adicionar o botão de som
+    soundOn = display.newImageRect(sceneGroup, "assets/mute.png", 60, 60)
+    soundOn.x = 685
+    soundOn.y = 210
 
-    local soundOn = display.newImageRect(sceneGroup, "assets/soundOn.png", 60, 60)
-        soundOn.x =  685
-        soundOn.y =  210
+    -- Adicionar texto para indicar ON ou OFF
+    soundText = display.newText({
+        parent = sceneGroup,
+        text = "Desligado",
+        x = soundOn.x,
+        y = soundOn.y + 40,
+        font = native.systemFontBold,
+        fontSize = 24,
+        align = "center"
+    })
+    soundText:setFillColor(65 / 255, 97 / 255, 176 / 255, 1)
+    soundText.status = "pausado"
 
-        -- Adicionar texto para indicar ON ou OFF abaixo da imagem do som
-        local soundText = display.newText({
-            parent = sceneGroup,
-            text = "Ligado", 
-            x = soundOn.x,
-            y = soundOn.y + 40, 
-            font = native.systemFontBold,
-            fontSize = 24,
-            align = "center"
-        })
-        -- Definir a cor rgba(65, 97, 176, 1)
-        soundText:setFillColor(65/255, 97/255, 176/255, 1)
-
-    local refButton = display.newImageRect(sceneGroup, "assets/ref.png", 130, 130)
-    refButton.x =  165
-    refButton.y = 280
-
-
-    refButton:addEventListener("tap",showPopup )
-    pulseButton(refButton)
-
-
- -- Adiciona eventos de toque para os botões "Reload" e "Prev"
- reloadButton:addEventListener("tap", onReloadButtonTap)
- prevButton:addEventListener("tap", onPrevButtonTap)
-
-
-      -- Função para alternar entre som ligado e mudo
-      local function toggleSound(event)
-        if soundHandle then
-                
-            soundOn.fill = { type = "image", filename = "assets/mute.png" }
-            soundText.text = "Desligado" -- Atualiza o texto para "OFF"
-            soundHandle = false
-        else
-            
+    -- Função para alternar entre som ligado e mudo
+    local function toggleSound()
+        if soundText.status == "pausado" then
+            -- Alterar para som ligado
             soundOn.fill = { type = "image", filename = "assets/soundOn.png" }
             soundText.text = "Ligado"
-            soundHandle = true
+            soundText.status = "tocando"
+            audio.stop(1)
+            audio.rewind(soundFile)
+            audio.play(soundFile, {
+                channel = 1,
+                loops = -1,
+                fadein = 1000
+            })
+        elseif soundText.status == "tocando" then
+            -- Alterar para som desligado
+            soundOn.fill = { type = "image", filename = "assets/mute.png" }
+            soundText.text = "Desligado"
+            soundText.status = "pausado"
+            audio.pause(1)
         end
     end
 
-soundOn: addEventListener("tap", toggleSound)
+    soundOn:addEventListener("tap", toggleSound)
+
+    -- Adicionar botão de referência
+    local refButton = display.newImageRect(sceneGroup, "assets/ref.png", 130, 130)
+    refButton.x = 165
+    refButton.y = 280
+    refButton:addEventListener("tap", showPopup)
+    pulseButton(refButton)
+
+    -- Adicionar eventos de toque para os botões
+    reloadButton:addEventListener("tap", onReloadButtonTap)
+    prevButton:addEventListener("tap", onPrevButtonTap)
 end
 
 -- show()
-function scene:show( event )
+function scene:show(event)
     local sceneGroup = self.view
     local phase = event.phase
 
-    if ( phase == "will" ) then
-        -- Code here runs when the scene is still off screen (but is about to come on screen)
-
-    elseif ( phase == "did" ) then
-        -- Code here runs when the scene is entirely on screen
-
+    if (phase == "will") then
+        -- Código antes da cena aparecer
+    elseif (phase == "did") then
+        -- Código após a cena estar visível
     end
 end
 
 -- hide()
-function scene:hide( event )
+function scene:hide(event)
     local sceneGroup = self.view
     local phase = event.phase
 
-    if ( phase == "will" ) then
-        -- Code here runs when the scene is on screen (but is about to go off screen)
-
-    elseif ( phase == "did" ) then
-        -- Code here runs immediately after the scene goes entirely off screen
-
+    if (phase == "will") then
+        -- Código antes da cena sair da tela
+        audio.stop(1)
+        if soundText then
+            soundText.status = "pausado"
+            soundOn.fill = { type = "image", filename = "assets/mute.png" }
+            soundText.text = "Desligado"
+        end
     end
 end
 
 -- destroy()
-function scene:destroy( event )
+function scene:destroy(event)
     local sceneGroup = self.view
-    -- Code here runs prior to the removal of scene's view
-
+    -- Libera recursos de áudio
+    if soundFile then
+        audio.dispose(soundFile)
+        soundFile = nil
+    end
 end
 
--- -----------------------------------------------------------------------------------
 -- Scene event function listeners
--- -----------------------------------------------------------------------------------
-scene:addEventListener( "create", scene )
-scene:addEventListener( "show", scene )
-scene:addEventListener( "hide", scene )
-scene:addEventListener( "destroy", scene )
--- -----------------------------------------------------------------------------------
+scene:addEventListener("create", scene)
+scene:addEventListener("show", scene)
+scene:addEventListener("hide", scene)
+scene:addEventListener("destroy", scene)
 
 return scene

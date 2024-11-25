@@ -4,24 +4,20 @@ local scene = composer.newScene()
 local physics = require("physics")
 physics.start()
 
--- Número total de elementos criados na tela
+-- Variáveis para controlar elementos e timers
 local totalElements = 6
-local collectedElements = 0 -- Contador de elementos coletados
-local atpTimer -- Timer para o efeito contínuo de ATP
+local collectedElements = 0
+local atpTimer
+local elementCounts = { NH3 = 0, H2S = 0, CH4 = 0 }
+local elements = {}
+local timers = {}
 
--- Contadores para cada tipo de elemento
-local elementCounts = {
-    NH3 = 0,
-    H2S = 0,
-    CH4 = 0
-}
-
-local elements = {} -- Armazena os elementos criados
-local timers = {} -- Armazena os timers ativos
+local soundFile = audio.loadStream("assetsAudio/minerais.mp3") -- Substitua pelo caminho do seu arquivo de áudio
+local soundText
+local soundOn
 
 -- Função para limpar recursos da cena
 local function cleanScene()
-    -- Remove todos os elementos
     for i = #elements, 1, -1 do
         if elements[i] and elements[i].removeSelf then
             elements[i]:removeSelf()
@@ -30,7 +26,6 @@ local function cleanScene()
     end
     elements = {}
 
-    -- Cancela timers
     if atpTimer then
         timer.cancel(atpTimer)
         atpTimer = nil
@@ -44,7 +39,6 @@ local function cleanScene()
     end
     timers = {}
 
-    -- Reinicia os contadores
     collectedElements = 0
     elementCounts = { NH3 = 0, H2S = 0, CH4 = 0 }
 end
@@ -127,7 +121,6 @@ function scene:create(event)
         table.insert(elements, element)
     end
 
-    -- Salvar a função de criação de elementos para o método `show`
     self.createElement = createElement
 
     -- Adicionar a imagem do botão
@@ -139,21 +132,46 @@ function scene:create(event)
     Prevbutton.x = 130
     Prevbutton.y = 980
 
-    local soundOn = display.newImageRect(sceneGroup, "assets/soundOn.png", 60, 60)
+    -- Adicionar o botão de som
+    soundOn = display.newImageRect(sceneGroup, "assets/mute.png", 60, 60)
     soundOn.x = 685
     soundOn.y = 210
 
     -- Adicionar texto para indicar ON ou OFF
-    local soundText = display.newText({
+    soundText = display.newText({
         parent = sceneGroup,
-        text = "Ligado", 
+        text = "Desligado",
         x = soundOn.x,
-        y = soundOn.y + 40, 
+        y = soundOn.y + 40,
         font = native.systemFontBold,
         fontSize = 24,
         align = "center"
     })
-    soundText:setFillColor(65/255, 97/255, 176/255, 1)
+    soundText:setFillColor(65 / 255, 97 / 255, 176 / 255, 1)
+    soundText.status = "pausado"
+
+    -- Função para alternar entre som ligado e mudo
+    local function toggleSound()
+        if soundText.status == "pausado" then
+            soundOn.fill = { type = "image", filename = "assets/soundOn.png" }
+            soundText.text = "Ligado"
+            soundText.status = "tocando"
+            audio.stop(1)
+            audio.rewind(soundFile)
+            audio.play(soundFile, {
+                channel = 1,
+                loops = -1,
+                fadein = 1000
+            })
+        elseif soundText.status == "tocando" then
+            soundOn.fill = { type = "image", filename = "assets/mute.png" }
+            soundText.text = "Desligado"
+            soundText.status = "pausado"
+            audio.pause(1)
+        end
+    end
+
+    soundOn:addEventListener("tap", toggleSound)
 
     Nextbutton:addEventListener("tap", function()
         composer.gotoScene("Pag4")
@@ -162,27 +180,12 @@ function scene:create(event)
     Prevbutton:addEventListener("tap", function()
         composer.gotoScene("Pag3-2")
     end)
-
-    local function toggleSound()
-        if soundHandle then
-            soundOn.fill = { type = "image", filename = "assets/mute.png" }
-            soundText.text = "Desligado" 
-            soundHandle = false
-        else
-            soundOn.fill = { type = "image", filename = "assets/soundOn.png" }
-            soundText.text = "Ligado"
-            soundHandle = true
-        end
-    end
-
-    soundOn:addEventListener("tap", toggleSound)
 end
 
 function scene:show(event)
     if event.phase == "did" then
         physics.start()
 
-        -- Recriar elementos ao retornar para a cena
         for i = 1, 2 do
             self.createElement("NH3", math.random(50, display.contentWidth - 50), math.random(150, display.contentHeight - 150))
             self.createElement("H2S", math.random(50, display.contentWidth - 50), math.random(150, display.contentHeight - 150))
@@ -194,11 +197,21 @@ end
 function scene:hide(event)
     if event.phase == "will" then
         cleanScene()
+        audio.stop(1)
+        if soundText then
+            soundText.status = "pausado"
+            soundOn.fill = { type = "image", filename = "assets/mute.png" }
+            soundText.text = "Desligado"
+        end
     end
 end
 
 function scene:destroy(event)
     cleanScene()
+    if soundFile then
+        audio.dispose(soundFile)
+        soundFile = nil
+    end
 end
 
 scene:addEventListener("create", scene)
