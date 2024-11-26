@@ -7,7 +7,7 @@ local physics = require("physics")
 local molecules = {} -- Armazena moléculas criadas
 local timers = {}    -- Armazena referências de timers
 local cell -- Referência ao objeto da célula
-local soundFile = audio.loadStream("assetsAudio/glicose.mp3") -- Substitua pelo caminho do seu arquivo de áudio
+local soundFile = audio.loadStream("assetsAudio/glicose.mp3") 
 
 
 -- Deletar todos os recursos

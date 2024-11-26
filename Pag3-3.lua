@@ -12,7 +12,7 @@ local elementCounts = { NH3 = 0, H2S = 0, CH4 = 0 }
 local elements = {}
 local timers = {}
 
-local soundFile = audio.loadStream("assetsAudio/minerais.mp3") -- Substitua pelo caminho do seu arquivo de áudio
+local soundFile = audio.loadStream("assetsAudio/minerais.mp3") 
 local soundText
 local soundOn
 

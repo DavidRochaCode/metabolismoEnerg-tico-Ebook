@@ -2,7 +2,7 @@ local composer = require("composer")
 local scene = composer.newScene()
 
 -- Variáveis globais para a cena
-local soundFile = audio.loadStream("assetsAudio/contraCapa.mp3") -- Substitua pelo caminho do seu arquivo de áudio
+local soundFile = audio.loadStream("assetsAudio/contraCapa.mp3") 
 local soundText
 local soundOn
 local popupGroup

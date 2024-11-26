@@ -9,7 +9,7 @@ local isCloudNearSun = false -- Variável de controle para verificar se a nuvem 
 local isCloudMoved = false -- Controle para verificar se a nuvem saiu da posição inicial
 local cloudStartX = nil -- Posição inicial da nuvem
 
-local soundFile = audio.loadStream("assetsAudio/arrastar_nuvem.mp3") -- Substitua pelo caminho do seu arquivo de áudio
+local soundFile = audio.loadStream("assetsAudio/arrastar_nuvem.mp3") 
 local soundText
 local soundOn
 

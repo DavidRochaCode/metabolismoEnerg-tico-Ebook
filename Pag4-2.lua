@@ -6,7 +6,7 @@ local startDistance = nil
 local isMoleculeSplit = false
 local compounds = {} -- Armazena os compostos criados para facilitar a limpeza
 
-local soundFile = audio.loadStream("assetsAudio/separar_glicose.mp3") -- Substitua pelo caminho do seu arquivo de áudio
+local soundFile = audio.loadStream("assetsAudio/separar_glicose.mp3") 
 local soundText
 local soundOn
 
