@@ -2,7 +2,7 @@ local composer = require("composer")
 local scene = composer.newScene()
 
 -- Variáveis globais para a cena
-local soundFile = audio.loadStream("assetsAudio/sacudir.mp3") -- Substitua pelo caminho do seu arquivo de áudio
+local soundFile = audio.loadStream("assetsAudio/sacudir.mp3") 
 local soundText
 local soundOn
 local isShaken = false
@@ -82,7 +82,7 @@ function scene:create(event)
 
     -- Detectar agitação do dispositivo
     local function onAccelerometer(event)
-        if flask and (math.abs(event.xInstant) > 0.5 or math.abs(event.yInstant) > 0.5) then
+        if flask and (math.abs(event.xInstant) > 1.1 or math.abs(event.yInstant) > 1.1) then
             startFermentation()
         end
     end

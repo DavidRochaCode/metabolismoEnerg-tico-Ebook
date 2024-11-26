@@ -96,7 +96,7 @@ function scene:create(event)
     -- Salvar funções para recriação de recursos
     self.createMoleculeAndPinch = function()
         -- Molécula amarela que será separada
-        local molecule = display.newImageRect(sceneGroup, "assets/moleculeTriangle.png", 50, 50)
+        local molecule = display.newImageRect(sceneGroup, "assets/moleculeTriangle.png", 95, 95)
         molecule.x = display.contentCenterX
         molecule.y = display.contentCenterY
 
@@ -108,9 +108,9 @@ function scene:create(event)
         local function createCompound(type, xOffset, yOffset)
             local compoundImage
             if type == "ATP" then
-                compoundImage = "assets/ATP.png"
+                compoundImage = "assets/atpclicose.png"
             elseif type == "CO2" then
-                compoundImage = "assets/CO2Respiracao.png"
+                compoundImage = "assets/co2glicose.png"
             elseif type == "H2O" then
                 compoundImage = "assets/H2O.png"
             end
@@ -137,12 +137,12 @@ function scene:create(event)
                 local dy = event.y - event.yStart
                 local currentDistance = math.sqrt(dx * dx + dy * dy)
 
-                if currentDistance > startDistance * 1.5 then
+                if currentDistance > startDistance * 2.2 then
                     isMoleculeSplit = true
                     display.remove(molecule)
 
                     -- Criar compostos espalhados
-                    for i = 1, 5 do
+                    for i = 1, 9 do
                         createCompound("ATP", math.random(-100, 100), math.random(-50, 200))
                         createCompound("CO2", math.random(-100, 100), math.random(-50, 200))
                         createCompound("H2O", math.random(-100, 100), math.random(-50, 200))
